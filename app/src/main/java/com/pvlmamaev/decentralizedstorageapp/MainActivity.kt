@@ -16,6 +16,10 @@ import androidx.core.view.WindowCompat
 import java.io.File
 import javax.crypto.SecretKey
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
+
 class MainActivity : AppCompatActivity() {
 
     private var encryptionKey: SecretKey? = null
@@ -43,6 +47,15 @@ class MainActivity : AppCompatActivity() {
                 // Показываем путь к зашифрованному файлу (для отладки)
                 selectedFileText.append("\nФайл зашифрован: ${encryptedFile?.absolutePath}")
 
+                lifecycleScope.launch {
+                    try {
+                        val cid = PinataUploader.uploadFile(encryptedFile!!)
+                        selectedFileText.append("\nCID: $cid")
+                        // Здесь позже вызовем смарт-контракт с этим CID
+                    } catch (e: Exception) {
+                        selectedFileText.append("\nОшибка при загрузке: ${e.message}")
+                    }
+                }
             }
         }
     }
