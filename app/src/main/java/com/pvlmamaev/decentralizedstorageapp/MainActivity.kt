@@ -1,24 +1,22 @@
 package com.pvlmamaev.decentralizedstorageapp
 
 import android.os.Bundle
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-
+import androidx.core.view.WindowCompat
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.WindowCompat
 import java.io.File
 import javax.crypto.SecretKey
-
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var selectFileButton: Button
     private lateinit var selectedFileText: TextView
+    private lateinit var tonWebView: WebView
     private var selectedFileUri: Uri? = null
 
     // Регистрация колбэка на результат выбора файла
@@ -51,7 +50,13 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val cid = PinataUploader.uploadFile(encryptedFile!!)
                         selectedFileText.append("\nCID: $cid")
-                        // Здесь позже вызовем смарт-контракт с этим CID
+
+                        val base64Payload = CidSerializer.cidToBase64Boc(cid)
+
+                        // Показываем WebView и передаём payload в JavaScript
+                        tonWebView.visibility = View.VISIBLE
+                        tonWebView.evaluateJavascript("window.sendCid('$base64Payload')", null)
+
                     } catch (e: Exception) {
                         selectedFileText.append("\nОшибка при загрузке: ${e.message}")
                     }
@@ -62,23 +67,36 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Установка поведения, чтобы UI не заходил под статус-бар
         WindowCompat.setDecorFitsSystemWindows(window, true)
-
         setContentView(R.layout.activity_main)
 
-        // Инициализация кнопки и текста
+        // Инициализация UI
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileText = findViewById(R.id.selectedFileText)
+        tonWebView = findViewById(R.id.tonWebView)
 
-        // Обработка клика по кнопке
-        selectFileButton.setOnClickListener {
-            // Интент на выбор любого файла
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "*/*" // можно задать "image/*", "application/pdf" и т.д.
+        tonWebView.settings.javaScriptEnabled = true
+        tonWebView.settings.allowFileAccess = true
+        tonWebView.settings.domStorageEnabled = true
+
+        // JS-интерфейс для обратной связи из HTML (опционально)
+        tonWebView.addJavascriptInterface(object {
+            @JavascriptInterface
+            fun sendCidFromApp(bocBase64: String) {
+                tonWebView.post {
+                    tonWebView.evaluateJavascript("window.sendCid('$bocBase64')", null)
+                }
             }
-            // Запуск выбора файла
+        }, "Android")
+
+        tonWebView.loadUrl("file:///android_asset/deploy.html")
+        tonWebView.visibility = View.GONE
+
+        // Обработка нажатия кнопки выбора файла
+        selectFileButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "*/*"
+            }
             filePickerLauncher.launch(Intent.createChooser(intent, "Выберите файл"))
         }
     }

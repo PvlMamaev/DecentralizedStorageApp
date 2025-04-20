@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>TON Connect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module">
+        import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js";
+        import { toNano } from "https://unpkg.com/@ton/core@latest/dist/index.all.mjs";
+
+        const tonConnectUI = new TonConnectUI({
+          manifestUrl: "file:///android_asset/tonconnect-manifest.json"
+        });
+
+        // Привязка кнопки подключения к div с id
+        tonConnectUI.uiOptions = {
+          buttonRootId: "connect-button"
+        };
+
+        // Показываем кнопку
+        tonConnectUI.renderWalletConnection();
+
+        // Глобальная функция, вызываемая из Android
+        window.sendCid = async function (cidBoc) {
+          try {
+            await tonConnectUI.sendTransaction({
+              validUntil: Math.floor(Date.now() / 1000) + 600,
+              messages: [
+                {
+                  address: "EQANpQ6yztUW2Cl9EbSFIKgzcdacgv6MOFfR4qpZgs5YOuMN",
+                  amount: toNano("0.05").toString(),
+                  payload: cidBoc
+                }
+              ]
+            });
+            alert("✅ Транзакция отправлена!");
+          } catch (e) {
+            alert("❌ Ошибка при отправке: " + e);
+            console.error(e);
+          }
+        };
+    </script>
+</head>
+<body>
+<h1>TON Connect</h1>
+<div id="connect-button"></div>
+</body>
+</html>
