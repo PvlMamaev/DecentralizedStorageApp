@@ -2,26 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>TON Connect</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TON Connect</title>
+    <style>
+        body {
+          font-family: sans-serif;
+          padding: 1rem;
+          text-align: center;
+        }
+        #connect-button {
+          margin-top: 2rem;
+        }
+    </style>
     <script type="module">
-        import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js";
-        import { toNano } from "https://unpkg.com/@ton/core@latest/dist/index.all.mjs";
+        import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@0.2.6/dist/tonconnect-ui.min.js";
+        import { toNano } from "https://unpkg.com/@ton/core@0.0.5/dist/index.all.mjs";
+
+        console.log("🔥 HTML загружен");
 
         const tonConnectUI = new TonConnectUI({
-          manifestUrl: "file:///android_asset/tonconnect-manifest.json"
+          manifestUrl: "https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/tonconnect-manifest.json"
         });
 
-        // Привязка кнопки подключения к div с id
         tonConnectUI.uiOptions = {
           buttonRootId: "connect-button"
         };
 
-        // Показываем кнопку
         tonConnectUI.renderWalletConnection();
 
-        // Глобальная функция, вызываемая из Android
+        // Эта функция вызывается из Android через WebView
         window.sendCid = async function (cidBoc) {
+          console.log("📦 Получен CID для отправки:", cidBoc);
+
           try {
             await tonConnectUI.sendTransaction({
               validUntil: Math.floor(Date.now() / 1000) + 600,
@@ -33,10 +45,11 @@
                 }
               ]
             });
-            alert("✅ Транзакция отправлена!");
-          } catch (e) {
-            alert("❌ Ошибка при отправке: " + e);
-            console.error(e);
+
+            alert("✅ Транзакция успешно отправлена!");
+          } catch (error) {
+            console.error("❌ Ошибка при отправке:", error);
+            alert("❌ Ошибка при отправке: " + error);
           }
         };
     </script>

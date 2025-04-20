@@ -75,6 +75,20 @@ class MainActivity : AppCompatActivity() {
         selectedFileText = findViewById(R.id.selectedFileText)
         tonWebView = findViewById(R.id.tonWebView)
 
+        tonWebView.webViewClient = object : android.webkit.WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                println("✅ WebView: страница загружена: $url")
+            }
+        }
+
+        tonWebView.webChromeClient = object : android.webkit.WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
+                println("🟡 JS Console: ${consoleMessage?.message()}")
+                return super.onConsoleMessage(consoleMessage)
+            }
+        }
+
         tonWebView.settings.javaScriptEnabled = true
         tonWebView.settings.allowFileAccess = true
         tonWebView.settings.domStorageEnabled = true
@@ -83,13 +97,15 @@ class MainActivity : AppCompatActivity() {
         tonWebView.addJavascriptInterface(object {
             @JavascriptInterface
             fun sendCidFromApp(bocBase64: String) {
-                tonWebView.post {
-                    tonWebView.evaluateJavascript("window.sendCid('$bocBase64')", null)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    tonWebView.post {
+                        tonWebView.evaluateJavascript("window.sendCid('$bocBase64')", null)
+                    }
                 }
             }
         }, "Android")
 
-        tonWebView.loadUrl("file:///android_asset/deploy.html")
+        tonWebView.loadUrl("https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/deploy.html")
         tonWebView.visibility = View.GONE
 
         // Обработка нажатия кнопки выбора файла
