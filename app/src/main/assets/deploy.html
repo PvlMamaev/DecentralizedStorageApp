@@ -2,51 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TON Connect</title>
-    <style>
-        body {
-          font-family: sans-serif;
-          padding: 1rem;
-          text-align: center;
-        }
-        #connect-button {
-          margin-top: 2rem;
-        }
-    </style>
-    <script src="https://unpkg.com/@tonconnect/ui@0.2.6/dist/tonconnect-ui.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./tonconnect-ui.min.js"></script>
     <script>
-      console.log("🔥 HTML загружен");
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("🔥 HTML загружен");
 
-      const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: "https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/tonconnect-manifest.json",
-        buttonRootId: "connect-button"
+        const tonConnectUI = new TonConnectUI.TonConnectUI({
+          manifestUrl: "https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/tonconnect-manifest.json"
+        });
+
+        tonConnectUI.uiOptions = {
+          buttonRootId: "connect-button"
+        };
+
+        tonConnectUI.renderWalletConnection();
       });
-
-      tonConnectUI.renderWalletConnection();
-
-      // Эта функция вызывается из Android через WebView
-      window.sendCid = async function (cidBoc) {
-        console.log("📦 Получен CID для отправки:", cidBoc);
-
-        try {
-          await tonConnectUI.sendTransaction({
-            validUntil: Math.floor(Date.now() / 1000) + 600,
-            messages: [
-              {
-                address: "EQANpQ6yztUW2Cl9EbSFIKgzcdacgv6MOFfR4qpZgs5YOuMN",
-                amount: "50000000",
-                payload: cidBoc
-              }
-            ]
-          });
-
-          alert("✅ Транзакция успешно отправлена!");
-        } catch (error) {
-          console.error("❌ Ошибка при отправке:", error);
-          alert("❌ Ошибка при отправке: " + error);
-        }
-      };
     </script>
 </head>
 <body>
