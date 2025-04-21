@@ -4,6 +4,8 @@ import {
   useTonConnectUI
 } from '@tonconnect/ui-react';
 
+const MANIFEST = 'https://pvlmamaev.github.io/DecentralizedStorageApp/wallet-ui/public/tonconnect-manifest.json';
+
 function Page() {
   const [tonConnectUI] = useTonConnectUI();
 
@@ -16,9 +18,9 @@ function Page() {
         payload: 'BASE64_BOC'
       }]
     };
+
     try {
       const res = await tonConnectUI.sendTransaction(tx);
-      // передадим результат в Android
       (window as any).AndroidBridge?.onTxResult(JSON.stringify(res));
     } catch (e: any) {
       (window as any).AndroidBridge?.onTxError(e.message);
@@ -36,7 +38,7 @@ function Page() {
 export default function App() {
   return (
     <TonConnectUIProvider
-      manifestUrl="tonconnect-manifest.json"
+      manifestUrl={MANIFEST}
       actionsConfiguration={{ twaReturnUrl: 'myapp://tc-return' }}
     >
       <Page />
