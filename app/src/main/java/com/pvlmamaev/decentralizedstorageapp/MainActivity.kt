@@ -10,6 +10,7 @@ import androidx.core.view.WindowCompat
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -55,7 +56,14 @@ class MainActivity : AppCompatActivity() {
 
                         // Показываем WebView и передаём payload в JavaScript
                         tonWebView.visibility = View.VISIBLE
-                        tonWebView.evaluateJavascript("window.sendCid('$base64Payload')", null)
+                        tonWebView.evaluateJavascript(
+                            "window.sendCid && window.sendCid('$base64Payload');",
+                            null
+                        )
+
+
+                        val js = "pageReady && window.sendCid('$base64Payload')"
+                        tonWebView.post { tonWebView.evaluateJavascript(js, null) }
 
                     } catch (e: Exception) {
                         selectedFileText.append("\nОшибка при загрузке: ${e.message}")
@@ -79,6 +87,15 @@ class MainActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 println("✅ WebView: страница загружена: $url")
+
+                var pageReady = false
+
+                tonWebView.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        pageReady = true
+                    }
+                }
+
             }
         }
 
@@ -91,21 +108,29 @@ class MainActivity : AppCompatActivity() {
 
         tonWebView.settings.javaScriptEnabled = true
         tonWebView.settings.allowFileAccess = true
+        tonWebView.settings.allowFileAccessFromFileURLs = true
+        tonWebView.settings.allowUniversalAccessFromFileURLs = true
         tonWebView.settings.domStorageEnabled = true
 
         // JS-интерфейс для обратной связи из HTML (опционально)
         tonWebView.addJavascriptInterface(object {
             @JavascriptInterface
-            fun sendCidFromApp(bocBase64: String) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                    tonWebView.post {
-                        tonWebView.evaluateJavascript("window.sendCid('$bocBase64')", null)
-                    }
+            fun onTxResult(raw: String) {
+                runOnUiThread {
+                    selectedFileText.append("\n✅ Tx success: $raw")
                 }
             }
-        }, "Android")
+            @JavascriptInterface
+            fun onTxError(msg: String) {
+                runOnUiThread {
+                    selectedFileText.append("\n❌ Tx error: $msg")
+                }
+            }
+        }, "AndroidBridge")   // ← имя должно быть AndroidBridge
 
-        tonWebView.loadUrl("https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/deploy.html")
+
+//        tonWebView.loadUrl("https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/deploy.html")
+        tonWebView.loadUrl("file:///android_asset/tonconnect/index.html")
         tonWebView.visibility = View.GONE
 
         // Обработка нажатия кнопки выбора файла
