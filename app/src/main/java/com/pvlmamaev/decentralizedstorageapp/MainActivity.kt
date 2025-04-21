@@ -8,8 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.util.Log
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.TextView
@@ -78,61 +83,89 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         setContentView(R.layout.activity_main)
 
-        // Инициализация UI
+        // 0. Находим view
         selectFileButton = findViewById(R.id.selectFileButton)
         selectedFileText = findViewById(R.id.selectedFileText)
         tonWebView = findViewById(R.id.tonWebView)
 
-        tonWebView.webViewClient = object : android.webkit.WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                println("✅ WebView: страница загружена: $url")
-
-                var pageReady = false
-
-                tonWebView.webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        pageReady = true
-                    }
-                }
-
-            }
+        // 1. Включаем WebView‑дебаг (DevTools)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true)
         }
 
-        tonWebView.webChromeClient = object : android.webkit.WebChromeClient() {
-            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-                println("🟡 JS Console: ${consoleMessage?.message()}")
-                return super.onConsoleMessage(consoleMessage)
-            }
+        // 2. Базовые настройки WebView
+        with(tonWebView.settings) {
+            javaScriptEnabled = true
+            allowFileAccess = true
+            allowFileAccessFromFileURLs = true
+            allowUniversalAccessFromFileURLs = true
+            domStorageEnabled = true
         }
 
-        tonWebView.settings.javaScriptEnabled = true
-        tonWebView.settings.allowFileAccess = true
-        tonWebView.settings.allowFileAccessFromFileURLs = true
-        tonWebView.settings.allowUniversalAccessFromFileURLs = true
-        tonWebView.settings.domStorageEnabled = true
-
-        // JS-интерфейс для обратной связи из HTML (опционально)
+        // 3. Добавляем JS-интерфейс для обратной связи из React
+        //    — в React вы вызываете window.AndroidBridge.onTxResult / onTxError(...)
         tonWebView.addJavascriptInterface(object {
             @JavascriptInterface
             fun onTxResult(raw: String) {
-                runOnUiThread {
-                    selectedFileText.append("\n✅ Tx success: $raw")
-                }
+                runOnUiThread { selectedFileText.append("\n✅ Tx success: $raw") }
             }
             @JavascriptInterface
             fun onTxError(msg: String) {
-                runOnUiThread {
-                    selectedFileText.append("\n❌ Tx error: $msg")
+                runOnUiThread { selectedFileText.append("\n❌ Tx error: $msg") }
+            }
+        }, "AndroidBridge")
+
+        // 4. Кастомный WebViewClient для перехвата deep-link’ов ton://…
+        tonWebView.webViewClient = object : WebViewClient() {
+
+            // 1) Вот тут, сразу после '{', объявляем handleCustomScheme:
+            private fun handleCustomScheme(url: String): Boolean {
+                // пропускаем стандартные URL
+                if (url.startsWith("http://")
+                    || url.startsWith("https://")
+                    || url.startsWith("file://")
+                    || url.startsWith("about:blank")) {
+                    return false
+                }
+                // все остальные – открываем через Intent
+                return try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    true
+                } catch (e: ActivityNotFoundException) {
+                    Log.w("WebView", "No handler for scheme in URL: $url")
+                    true
                 }
             }
-        }, "AndroidBridge")   // ← имя должно быть AndroidBridge
+
+            // 2) А теперь override-методы, которые просто дергают handleCustomScheme:
+            override fun shouldOverrideUrlLoading(
+                view: WebView?, request: WebResourceRequest?
+            ): Boolean {
+                return handleCustomScheme(request?.url.toString())
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                Log.i("WebView", "📗 загружена страница: $url")
+            }
+
+            override fun onReceivedError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                error: WebResourceError?
+            ) {
+                Log.e("WebView", "❌ Ошибка при загрузке ${request?.url}: ${error?.description}")
+            }
+        }
 
 
-//        tonWebView.loadUrl("https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/deploy.html")
+        // 5. Загружаем вашу локальную сборку
+        //        tonWebView.loadUrl("https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/deploy.html")
         tonWebView.loadUrl("file:///android_asset/tonconnect/index.html")
         tonWebView.visibility = View.GONE
 
+
+        // 6. Далее ваш filePickerLauncher и отправка base64-пейлоада в JS:
         // Обработка нажатия кнопки выбора файла
         selectFileButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -140,5 +173,6 @@ class MainActivity : AppCompatActivity() {
             }
             filePickerLauncher.launch(Intent.createChooser(intent, "Выберите файл"))
         }
+
     }
 }
