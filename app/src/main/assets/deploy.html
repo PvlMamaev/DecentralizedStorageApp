@@ -4,22 +4,43 @@
     <meta charset="UTF-8" />
     <title>TON Connect</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="./tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@2.1.0/dist/tonconnect-ui.min.js"></script>
     <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        console.log("🔥 HTML загружен");
+        window.addEventListener("DOMContentLoaded", () => {
+          console.log("🔥 HTML загружен");
 
-        const tonConnectUI = new TonConnectUI.TonConnectUI({
-          manifestUrl: "https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/tonconnect-manifest.json"
+          const tonConnectUI = new TonConnectUI({
+            manifestUrl: "https://pvlmamaev.github.io/DecentralizedStorageApp/app/src/main/assets/tonconnect-manifest.json"
+          });
+
+          tonConnectUI.uiOptions = {
+            buttonRootId: "connect-button"e
+          };
+
+          tonConnectUI.renderWalletConnection();
+
+          window.sendCid = async function (cidBoc) {
+            try {
+              await tonConnectUI.sendTransaction({
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                  {
+                    address: "EQANpQ6yztUW2Cl9EbSFIKgzcdacgv6MOFfR4qpZgs5YOuMN",
+                    amount: "50000000",
+                    payload: cidBoc
+                  }
+                ]
+              });
+              alert("✅ Транзакция отправлена!");
+            } catch (e) {
+              alert("❌ Ошибка: " + e);
+              console.error(e);
+            }
+          };
         });
-
-        tonConnectUI.uiOptions = {
-          buttonRootId: "connect-button"
-        };
-
-        tonConnectUI.renderWalletConnection();
-      });
     </script>
+
+
 </head>
 <body>
 <h1>TON Connect</h1>

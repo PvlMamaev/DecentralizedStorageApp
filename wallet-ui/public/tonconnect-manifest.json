@@ -1,0 +1,9 @@
+{
+  "name": "My Storage App",
+  "url": "https://example.com",
+  "iconUrl": "https://example.com/icon.png",
+  "termsOfUseUrl": "https://example.com/terms",
+  "privacyPolicyUrl": "https://example.com/privacy",
+  "tonconnectVersion": "2"
+}
+
