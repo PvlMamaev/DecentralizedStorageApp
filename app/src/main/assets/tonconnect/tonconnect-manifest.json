@@ -1,9 +1,8 @@
 {
-  "name": "My Storage App",
-  "url": "https://example.com",
-  "iconUrl": "https://example.com/icon.png",
+  "url": "https://pvlmamaev.github.io/DecentralizedStorageApp",
+  "name": "DecentralizedStorageApp",
+  "iconUrl": "https://pvlmamaev.github.io/DecentralizedStorageApp/icon.png",
   "termsOfUseUrl": "https://example.com/terms",
-  "privacyPolicyUrl": "https://example.com/privacy",
-  "tonconnectVersion": "2"
+  "privacyPolicyUrl": "https://example.com/privacy"
 }
 
