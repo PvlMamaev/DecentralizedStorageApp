@@ -1,8 +1,7 @@
 {
   "url": "https://pvlmamaev.github.io/DecentralizedStorageApp",
   "name": "DecentralizedStorageApp",
-  "iconUrl": "https://pvlmamaev.github.io/DecentralizedStorageApp/icon.png",
+  "iconUrl": "https://pvlmamaev.github.io/DecentralizedStorageApp/wallet-ui/public/icon.png",
   "termsOfUseUrl": "https://example.com/terms",
   "privacyPolicyUrl": "https://example.com/privacy"
 }
-

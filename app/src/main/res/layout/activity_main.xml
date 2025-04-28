@@ -10,12 +10,28 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/connectToWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Подключить кошелек"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/sendTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Отправить транзакцию"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connectToWallet" />
+
+    <Button
         android:id="@+id/selectFileButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Выбрать файл"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/sendTransaction" />
 
     <TextView
         android:id="@+id/selectedFileText"

@@ -30,8 +30,11 @@ class MainActivity : AppCompatActivity() {
     private var encryptedFile: File? = null
 
     private lateinit var selectFileButton: Button
+    private lateinit var connectToWallet: Button
+    private lateinit var sendTransaction: Button
     private lateinit var selectedFileText: TextView
     private lateinit var tonWebView: WebView
+    private lateinit var base64Payload: String
     private var selectedFileUri: Uri? = null
 
     // Регистрация колбэка на результат выбора файла
@@ -57,18 +60,7 @@ class MainActivity : AppCompatActivity() {
                         val cid = PinataUploader.uploadFile(encryptedFile!!)
                         selectedFileText.append("\nCID: $cid")
 
-                        val base64Payload = CidSerializer.cidToBase64Boc(cid)
-
-                        // Показываем WebView и передаём payload в JavaScript
-                        tonWebView.visibility = View.VISIBLE
-                        tonWebView.evaluateJavascript(
-                            "window.sendCid && window.sendCid('$base64Payload');",
-                            null
-                        )
-
-
-                        val js = "pageReady && window.sendCid('$base64Payload')"
-                        tonWebView.post { tonWebView.evaluateJavascript(js, null) }
+                        base64Payload = CidSerializer.cidToBase64Boc(cid)
 
                     } catch (e: Exception) {
                         selectedFileText.append("\nОшибка при загрузке: ${e.message}")
@@ -85,6 +77,8 @@ class MainActivity : AppCompatActivity() {
 
         // 0. Находим view
         selectFileButton = findViewById(R.id.selectFileButton)
+        connectToWallet = findViewById(R.id.connectToWallet)
+        sendTransaction = findViewById(R.id.sendTransaction)
         selectedFileText = findViewById(R.id.selectedFileText)
         tonWebView = findViewById(R.id.tonWebView)
 
@@ -172,6 +166,32 @@ class MainActivity : AppCompatActivity() {
                 type = "*/*"
             }
             filePickerLauncher.launch(Intent.createChooser(intent, "Выберите файл"))
+        }
+
+
+        connectToWallet.setOnClickListener {
+            // Показываем WebView и передаём payload в JavaScript
+            tonWebView.visibility = View.VISIBLE
+//            tonWebView.evaluateJavascript(
+//                "window.sendCid && window.sendCid('$base64Payload');",
+//                null
+//            )
+
+//            val js = "pageReady && window.sendCid('$base64Payload')"
+//            tonWebView.post { tonWebView.evaluateJavascript(js, null) }
+        }
+
+        sendTransaction.setOnClickListener {
+            tonWebView.evaluateJavascript("window.checkConnection()", null)
+            val testCid = "QmQMFFKqQM7vCJVFUW9zDAfHqtupqjptB5YNUMmE66e1ZP"
+            val boc = CidSerializer.cidToBase64Boc(testCid)  // или сразу base64Boc, если у вас есть
+
+            tonWebView.evaluateJavascript(
+                "window.dispatchEvent(new Event('tonConnectReturn'));",
+                null
+            )
+            // затем
+            tonWebView.evaluateJavascript("window.sendCid('$boc')", null)
         }
 
     }

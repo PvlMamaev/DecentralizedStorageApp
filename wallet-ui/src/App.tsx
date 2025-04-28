@@ -12,7 +12,9 @@ function Page() {
   const [tonConnectUI] = useTonConnectUI();
 
   useEffect(() => {
+// Функция отправки транзакции для kotlin
     (window as any).sendCid = async (bocBase64: string) => {
+// Здесь мы создаем переменную вида json чтобы создать транзакцию
       const tx = {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
@@ -21,6 +23,7 @@ function Page() {
           payload: bocBase64
         }]
       };
+// Здесь мы вызываем функцию отправки транзакции из библиотеки
       try {
         const res = await tonConnectUI.sendTransaction(tx);
         (window as any).AndroidBridge?.onTxResult(JSON.stringify(res));
@@ -28,30 +31,19 @@ function Page() {
         (window as any).AndroidBridge?.onTxError(e.message);
       }
     };
-  }, [tonConnectUI]);  
 
- async function sendTx() {
-    const tx = {
-      validUntil: Math.floor(Date.now() / 1000) + 60,
-      messages: [{
-        address: 'EQANpQ6yztUW2Cl9EbSFIKgzcdacgv6MOFfR4qpZgs5YOuMN',
-        amount: '50000000',
-        payload: 'BASE64_BOC'
-      }]
-    };
-
-    try {
-      const res = await tonConnectUI.sendTransaction(tx);
-      (window as any).AndroidBridge?.onTxResult(JSON.stringify(res));
-    } catch (e: any) {
-      (window as any).AndroidBridge?.onTxError(e.message);
+// Функция проверки подключения кошелька для kotlin
+    (window as any).checkConnection = () => {
+      // SDK хранит текущее подключение в tonConnectUI.connector.wallet
+      const isConnected = !!(tonConnectUI.connector.wallet)
+      return isConnected
     }
-  }
 
-  return (
+  }, [tonConnectUI]);  
+ 
+return (
     <>
       <TonConnectButton />
-      <button onClick={sendTx}>Send transaction</button>
     </>
   );
 }
@@ -59,8 +51,7 @@ function Page() {
 export default function App() {
   return (
     <TonConnectUIProvider
-      manifestUrl={MANIFEST}
-      actionsConfiguration={{ twaReturnUrl: 'myapp://tc-return' }}
+      manifestUrl={MANIFEST} 
     >
       <Page />
     </TonConnectUIProvider>
