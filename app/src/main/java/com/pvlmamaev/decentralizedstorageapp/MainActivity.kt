@@ -112,30 +112,34 @@ class MainActivity : AppCompatActivity() {
         // 4. Кастомный WebViewClient для перехвата deep-link’ов ton://…
         tonWebView.webViewClient = object : WebViewClient() {
 
-            // 1) Вот тут, сразу после '{', объявляем handleCustomScheme:
-            private fun handleCustomScheme(url: String): Boolean {
-                // пропускаем стандартные URL
-                if (url.startsWith("http://")
-                    || url.startsWith("https://")
-                    || url.startsWith("file://")
-                    || url.startsWith("about:blank")) {
-                    return false
-                }
-                // все остальные – открываем через Intent
-                return try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    true
-                } catch (e: ActivityNotFoundException) {
-                    Log.w("WebView", "No handler for scheme in URL: $url")
-                    true
-                }
-            }
-
-            // 2) А теперь override-методы, которые просто дергают handleCustomScheme:
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest?
             ): Boolean {
-                return handleCustomScheme(request?.url.toString())
+                val url = request?.url.toString()
+
+                // --- (а) Tonkeeper universal-links ---
+                if (url.startsWith("https://app.tonkeeper.com") ||
+                    url.startsWith("https://wallet.tonkeeper.com")   // на всякий случай
+                ) {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    } catch (e: ActivityNotFoundException) {
+                        Log.w("WebView", "Tonkeeper is not installed")
+                    }
+                    return true            // << ключевая строка — не даём WebView загружать URL
+                }
+
+                // --- (б) любые другие не-http схемы (ton://, tonkeeper:// …) ---
+                if (!url.startsWith("http://") && !url.startsWith("https://")
+                    && !url.startsWith("about:blank") && !url.startsWith("file://")
+                ) {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    } catch (e: ActivityNotFoundException) { /* … */ }
+                    return true
+                }
+
+                return false               // обычная загрузка в WebView
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {

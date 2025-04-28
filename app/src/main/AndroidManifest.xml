@@ -17,10 +17,20 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+            <!-- Значок-запускалка -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- deep-link «intent://tonconnect» -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <!-- схема + host ДОЛЖНЫ совпадать с тем, что прописано в return_url -->
+                <data android:scheme="https" android:host="tonconnect"/>
             </intent-filter>
         </activity>
     </application>
