@@ -114,41 +114,38 @@ class MainActivity : AppCompatActivity() {
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest?
             ): Boolean {
+
                 val url = request?.url.toString()
-                val tonkeeper_pkg = "com.ton_keeper"
 
-                // --- (а) Tonkeeper universal-links ---
+                // --- (A) Tonkeeper ---
                 if (url.startsWith("https://app.tonkeeper.com") ||
-                    url.startsWith("https://wallet.tonkeeper.com")   // на всякий случай
-                ) {
+                    url.startsWith("https://wallet.tonkeeper.com")) {
 
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-                        setPackage(tonkeeper_pkg)                // ← ключевая строка
-                        // API 30+: гарантирует, что браузер не выберется даже
-                        // если пользователь снимет галочку «Запомнить выбор»
-                        addFlags(Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER)
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    // пробуем адресовать именно Tonkeeper;
+                    // если не установлен – не задаём пакет и дадим шанс другим
+                    if (isInstalled("com.ton_keeper")) {
+                        intent.setPackage("com.ton_keeper")
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER)
                     }
-
-                    try { startActivity(intent) }
-                    catch (e: ActivityNotFoundException) {
-                        Log.w("WebView", "Tonkeeper not installed")
-                        // при желании: открыть Google Play
-                    }
-                    return true            // << ключевая строка — не даём WebView загружать URL
-                }
-
-                // --- (б) любые другие не-http схемы (ton://, tonkeeper:// …) ---
-                if (!url.startsWith("http://") && !url.startsWith("https://")
-                    && !url.startsWith("about:blank") && !url.startsWith("file://")
-                ) {
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    } catch (e: ActivityNotFoundException) { /* … */ }
+                    startActivity(intent)
                     return true
                 }
 
-                return false               // обычная загрузка в WebView
+                // --- (B) все остальные deep-links (https://t.me/wallet…, ton:// …) ---
+                if (!url.startsWith("http://") && !url.startsWith("https://")
+                    || url.startsWith("https://t.me/")          // Telegram Wallet
+                ) {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    return true
+                }
+
+                return false
             }
+
+            private fun isInstalled(pkg: String): Boolean =
+                packageManager.getLaunchIntentForPackage(pkg) != null
+
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)

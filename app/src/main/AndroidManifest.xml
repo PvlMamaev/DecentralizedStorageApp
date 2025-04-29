@@ -35,4 +35,7 @@
         </activity>
     </application>
 
+    <queries>
+        <package android:name="com.ton_keeper"/>
+    </queries>
 </manifest>
