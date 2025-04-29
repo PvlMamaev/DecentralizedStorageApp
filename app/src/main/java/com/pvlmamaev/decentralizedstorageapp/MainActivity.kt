@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.view.View
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import android.app.Activity
@@ -116,15 +115,24 @@ class MainActivity : AppCompatActivity() {
                 view: WebView?, request: WebResourceRequest?
             ): Boolean {
                 val url = request?.url.toString()
+                val tonkeeper_pkg = "com.ton_keeper"
 
                 // --- (а) Tonkeeper universal-links ---
                 if (url.startsWith("https://app.tonkeeper.com") ||
                     url.startsWith("https://wallet.tonkeeper.com")   // на всякий случай
                 ) {
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    } catch (e: ActivityNotFoundException) {
-                        Log.w("WebView", "Tonkeeper is not installed")
+
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                        setPackage(tonkeeper_pkg)                // ← ключевая строка
+                        // API 30+: гарантирует, что браузер не выберется даже
+                        // если пользователь снимет галочку «Запомнить выбор»
+                        addFlags(Intent.FLAG_ACTIVITY_REQUIRE_NON_BROWSER)
+                    }
+
+                    try { startActivity(intent) }
+                    catch (e: ActivityNotFoundException) {
+                        Log.w("WebView", "Tonkeeper not installed")
+                        // при желании: открыть Google Play
                     }
                     return true            // << ключевая строка — не даём WebView загружать URL
                 }
