@@ -1,55 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/nav_host"
+    android:name="androidx.navigation.fragment.NavHostFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:padding="24dp"
+    app:defaultNavHost="true"
+    app:navGraph="@navigation/nav_graph"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/connectToWallet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Подключить кошелек"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/sendTransaction"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Отправить транзакцию"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connectToWallet" />
-
-    <Button
-        android:id="@+id/selectFileButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Выбрать файл"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendTransaction" />
-
-    <TextView
-        android:id="@+id/selectedFileText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:text="Файл не выбран"
-        app:layout_constraintStart_toStartOf="@+id/selectFileButton"
-        app:layout_constraintTop_toBottomOf="@+id/selectFileButton" />
-
-    <WebView
-        android:id="@+id/tonWebView"
-        android:layout_width="0dp"
-        android:layout_height="600dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectedFileText" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.fragment.app.FragmentContainerView>

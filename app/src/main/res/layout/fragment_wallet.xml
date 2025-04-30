@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".WalletFragment">
+
+    <Button
+        android:id="@+id/connectToWallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Подключить кошелек"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <Button
+        android:id="@+id/sendTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Отправить транзакцию"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connectToWallet" />
+
+    <WebView
+        android:id="@+id/tonWebView"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendTransaction" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
