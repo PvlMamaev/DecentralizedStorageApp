@@ -12,6 +12,11 @@ function Page() {
   const [tonConnectUI] = useTonConnectUI();
 
   useEffect(() => {
+// Подключение кошелька при загрузке страницы
+  if (!tonConnectUI.connector.wallet) {
+    tonConnectUI.connectWallet();
+  }
+
 // Функция отправки транзакции для kotlin
     (window as any).sendCid = async (bocBase64: string) => {
 // Здесь мы создаем переменную вида json чтобы создать транзакцию
@@ -43,7 +48,7 @@ function Page() {
  
 return (
     <>
-      <TonConnectButton />
+      <TonConnectButton style={{ display: 'none' }} />
     </>
   );
 }

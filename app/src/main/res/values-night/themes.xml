@@ -58,4 +58,8 @@
         <item name="colorOnCustomColorContainer">@color/colorOnCustomColorContainer</item>
     </style>
 
+    <style name="TransparentBottomSheet" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/TransparentBottomSheet</item>
+    </style>
+
 </resources>
