@@ -67,7 +67,7 @@ class FileFragment : Fragment(R.layout.fragment_file) {
     override fun onViewCreated(v: View, savedInstanceState: Bundle?) {
         selectedFileText = v.findViewById(R.id.selectedFileText)
 
-        v.findViewById<Button>(R.id.selectFileButton).setOnClickListener {
+        v.findViewById<View>(R.id.selectFileButton).setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "*/*"
             }

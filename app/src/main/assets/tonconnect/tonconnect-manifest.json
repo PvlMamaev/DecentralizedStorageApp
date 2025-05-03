@@ -3,5 +3,10 @@
   "name": "DecentralizedStorageApp",
   "iconUrl": "https://pvlmamaev.github.io/DecentralizedStorageApp/wallet-ui/public/icon.png",
   "termsOfUseUrl": "https://example.com/terms",
-  "privacyPolicyUrl": "https://example.com/privacy"
+  "privacyPolicyUrl": "https://example.com/privacy",
+
+  "return_url": {
+    "android": "intent://tonconnect#Intent;package=com.pvlmamaev.decentralizedstorageapp;scheme=https;end"
+  }
 }
+

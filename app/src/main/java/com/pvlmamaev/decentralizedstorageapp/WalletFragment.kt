@@ -1,6 +1,7 @@
 package com.pvlmamaev.decentralizedstorageapp
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -41,6 +42,9 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
             // Делаем webview видимым чтобы стала доступна кнопка подключения
             // кошелька из react
             tonWebView.visibility = View.VISIBLE
+            // Делаем фон webview прозрачным
+            tonWebView.setBackgroundColor(Color.TRANSPARENT)
+            tonWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         }
 
         // Обработчик нажатия на кнопку отправки транзакции
