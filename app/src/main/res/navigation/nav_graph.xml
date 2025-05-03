@@ -3,21 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/fileFragment">
+    app:startDestination="@id/walletFragment">
 
     <fragment
         android:id="@+id/fileFragment"
         android:name="com.pvlmamaev.decentralizedstorageapp.FileFragment"
         android:label="fragment_file"
-        tools:layout="@layout/fragment_file" >
-        <action
-            android:id="@+id/action_fileFragment_to_walletFragment"
-            app:destination="@id/walletFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_file" />
 
     <fragment
         android:id="@+id/walletFragment"
         android:name="com.pvlmamaev.decentralizedstorageapp.WalletFragment"
         android:label="fragment_wallet"
-        tools:layout="@layout/fragment_wallet" />
+        tools:layout="@layout/fragment_wallet" >
+        <action
+            android:id="@+id/action_walletFragment_to_fileFragment"
+            app:destination="@id/fileFragment" />
+    </fragment>
 </navigation>

@@ -5,15 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.crypto.SecretKey
@@ -72,10 +68,6 @@ class FileFragment : Fragment(R.layout.fragment_file) {
                 type = "*/*"
             }
             filePickerLauncher.launch(Intent.createChooser(intent, "Выберите файл"))
-        }
-
-        v.findViewById<Button>(R.id.nextButton).setOnClickListener {
-            findNavController().navigate(R.id.action_fileFragment_to_walletFragment)
         }
     }
 }

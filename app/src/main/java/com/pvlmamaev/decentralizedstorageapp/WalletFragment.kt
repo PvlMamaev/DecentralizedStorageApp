@@ -14,6 +14,7 @@ import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 
 // флаг, чтобы загружать WebView только один раз
 private var webViewLoaded = false
@@ -35,6 +36,10 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
         sendButton = v.findViewById(R.id.sendTransaction)
         // Основная функция работы. Представлена ниже
         prepareWebView()
+
+        v.findViewById<Button>(R.id.buttonNextFragment).setOnClickListener {
+            findNavController().navigate(R.id.action_walletFragment_to_fileFragment)
+        }
 
         // Обработчик нажатия на кнопку подключения кошелька
         v.findViewById<Button>(R.id.connectToWallet).setOnClickListener {

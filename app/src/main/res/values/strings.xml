@@ -2,6 +2,8 @@
     <string name="app_name">Egida</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="connectMessage">Чтобы загрузить и зашифровать ваш файл в IPFS, необходимо подключить TON-кошелёк.</string>
+    <string name="connectMessage2">Это безопасно — вы контролируете свои данные и можете отключить доступ в любой момент.</string>
     <attr name="colorCustomColor" format="color" />
     <attr name="colorOnCustomColor" format="color" />
     <attr name="colorCustomColorContainer" format="color" />

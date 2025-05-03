@@ -8,27 +8,72 @@
     tools:context=".WalletFragment">
 
     <Button
-        android:id="@+id/connectToWallet"
-        android:layout_width="match_parent"
+        android:id="@+id/buttonNextFragment"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Подключить кошелек"
+        android:text="Next fragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageConnectWallet"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:src="@drawable/transfer_money"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintVertical_bias="0.392" />
+
+    <TextView
+        android:id="@+id/textToWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="16dp"
+        android:text="@string/connectMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageConnectWallet" />
+
+    <TextView
+        android:layout_margin="8dp"
+        android:id="@+id/textToWelcome2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/connectMessage2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textToWelcome" />
+
+    <Button
+        android:layout_margin="16dp"
+        android:id="@+id/connectToWallet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Подключить кошелек"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textToWelcome2" />
 
     <Button
         android:id="@+id/sendTransaction"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Отправить транзакцию"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/connectToWallet" />
 
     <WebView
         android:id="@+id/tonWebView"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
+        android:layout_height="0dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sendTransaction" />
 
