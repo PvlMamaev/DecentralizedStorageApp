@@ -5,19 +5,18 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.JavascriptInterface
-import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+
+// флаг, чтобы загружать WebView только один раз
+private var webViewLoaded = false
 
 class WalletFragment : Fragment(R.layout.fragment_wallet) {
 
@@ -96,14 +95,11 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
         tonWebView.addJavascriptInterface(object {
             @JavascriptInterface
             fun onTxResult(raw: String) =
-//                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(),"✅ $raw",Toast.LENGTH_SHORT).show()
-//                }
+                Toast.makeText(requireContext(), "✅ $raw", Toast.LENGTH_SHORT).show()
+
             @JavascriptInterface
             fun onTxError(msg: String) =
-//                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(),"❌ $msg",Toast.LENGTH_SHORT).show()
-//                }
+                Toast.makeText(requireContext(), "❌ $msg", Toast.LENGTH_SHORT).show()
         }, "AndroidBridge")
 
         // 4. Кастомный WebViewClient для перехвата deep-link’ов ton://…
@@ -117,7 +113,8 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
 
                 // --- (A) Tonkeeper ---
                 if (url.startsWith("https://app.tonkeeper.com") ||
-                    url.startsWith("https://wallet.tonkeeper.com")) {
+                    url.startsWith("https://wallet.tonkeeper.com")
+                ) {
 
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     // пробуем адресовать именно Tonkeeper;
@@ -145,27 +142,23 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
             // Tonkeeper и получает название пакета. Иначе null
             private fun isInstalled(pkg: String): Boolean =
                 requireContext().packageManager.getLaunchIntentForPackage(pkg) != null
-
-            // Функция которая нигде не используется
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                Log.i("WebView", "📗 загружена страница: $url")
-            }
-
-            // Функция которая нигде не используется
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                Log.e("WebView", "❌ Ошибка при загрузке ${request?.url}: ${error?.description}")
-            }
         }
 
         // При открытии webview будет загружаться страница index.html
         // из файла по указанному пути
+        // Мб нужно будет раскомментрировать эти строки ------------
+//        if (webViewLoaded) return
+//        webViewLoaded = true
+        // чтобы не создавался webview несколько раз ---------------
         tonWebView.loadUrl("file:///android_asset/tonconnect/index.html")
-        // Делаем webview невидимым
-        tonWebView.visibility = View.GONE
+    }
+
+    override fun onDestroyView() {
+        // Очищаем память от webview
+        tonWebView.loadUrl("about:blank")
+        tonWebView.clearHistory()
+        tonWebView.removeAllViews()
+        tonWebView.destroy()
+        super.onDestroyView()
     }
 }

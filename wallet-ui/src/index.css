@@ -65,3 +65,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+[data-tc-icon-button="true"] {
+  display: none !important;
+}
+
+[data-tc-wallets-modal-container="true"][data-tc-modal="true"] {
+  background-color: transparent !important;
+}
+
+
