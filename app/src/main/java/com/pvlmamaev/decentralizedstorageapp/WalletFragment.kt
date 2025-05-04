@@ -31,7 +31,11 @@ class WalletFragment : Fragment(R.layout.fragment_wallet) {
         // Обработчик нажатия на кнопку подключения кошелька
         v.findViewById<Button>(R.id.connectToWallet).setOnClickListener {
             // Открываем BottomSheet
-            TonConnectBottomSheet().show(parentFragmentManager, "TonConnectBottomSheet")
+            tonConnectBottomSheet.show(parentFragmentManager, "TonConnectBottomSheet")
+            // Ждём, пока отрисуется WebView
+            Handler(Looper.getMainLooper()).postDelayed({
+                tonConnectBottomSheet.connectWallet()
+            }, 500)
         }
 
         // Обработчик нажатия на кнопку отправки транзакции

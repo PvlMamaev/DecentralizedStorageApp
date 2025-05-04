@@ -66,6 +66,15 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
             fun onTxError(msg: String) {
                 Toast.makeText(context, "❌ $msg", Toast.LENGTH_SHORT).show()
             }
+
+            @JavascriptInterface
+            fun onTxComplete() {
+                // Закрываем BottomSheet
+                Toast.makeText(context, "Закрываем BottomSheet", Toast.LENGTH_SHORT).show()
+                activity?.runOnUiThread {
+                    dismiss()
+                }
+            }
         }, "AndroidBridge")
 
         // Кастомный WebViewClient для перехвата deep-link’ов ton://…
@@ -137,5 +146,19 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
         // Вызываем из react функцию sendCid в которую передаем значение
         // которое достали из MainViewModel
         tonWebView.evaluateJavascript("window.sendCid('$boc')", null)
+    }
+
+    fun connectWallet() {
+        // если WebView уже загружена
+        if (::tonWebView.isInitialized) {
+            tonWebView.evaluateJavascript("window.connectWalletManually()", null)
+        } else {
+            // иначе, ждем загрузку страницы и потом вызываем
+            tonWebView.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    tonWebView.evaluateJavascript("window.connectWalletManually()", null)
+                }
+            }
+        }
     }
 }
