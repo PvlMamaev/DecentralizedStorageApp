@@ -16,6 +16,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class TonConnectBottomSheet : BottomSheetDialogFragment() {
@@ -63,19 +65,35 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
             @JavascriptInterface
             fun onTxResult(raw: String) {
                 Toast.makeText(context, "✅ $raw", Toast.LENGTH_SHORT).show()
+                // Закрываем BottomSheet после удачной транзакции
+                activity?.runOnUiThread {
+                    dismiss()
+                }
             }
 
             @JavascriptInterface
             fun onTxError(msg: String) {
                 Toast.makeText(context, "❌ $msg", Toast.LENGTH_SHORT).show()
+                // Закрываем BottomSheet после неудачной транзакции
+                activity?.runOnUiThread {
+                    dismiss()
+                }
             }
 
             @JavascriptInterface
             fun onTxComplete() {
-                // Закрываем BottomSheet
+                // Закрываем BottomSheet после окна подключения кошелька
                 Toast.makeText(context, "Закрываем BottomSheet", Toast.LENGTH_SHORT).show()
                 activity?.runOnUiThread {
                     dismiss()
+                    findNavController().navigate(
+                        R.id.action_walletFragment_to_fileFragment, null,
+                        NavOptions.Builder()
+                            .setEnterAnim(androidx.navigation.ui.R.anim.nav_default_enter_anim)
+                            .setExitAnim(androidx.navigation.ui.R.anim.nav_default_exit_anim)
+                            .setPopUpTo(R.id.walletFragment, true)
+                            .build()
+                    )
                 }
             }
         }, "AndroidBridge")

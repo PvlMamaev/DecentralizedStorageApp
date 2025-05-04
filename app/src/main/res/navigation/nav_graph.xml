@@ -18,6 +18,8 @@
         tools:layout="@layout/fragment_wallet" >
         <action
             android:id="@+id/action_walletFragment_to_fileFragment"
-            app:destination="@id/fileFragment" />
+            app:destination="@id/fileFragment"
+            app:enterAnim="@anim/nav_default_pop_enter_anim"
+            app:exitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 </navigation>

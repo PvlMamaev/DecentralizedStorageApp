@@ -39,12 +39,8 @@ function Page() {
       try {
         const res = await tonConnectUI.sendTransaction(tx);
         (window as any).AndroidBridge?.onTxResult(JSON.stringify(res));
-	// Передаем результат подключения чтобы закрыть BottomSheet
-	(window as any).AndroidBridge?.onTxComplete?.();
       } catch (e: any) {
         (window as any).AndroidBridge?.onTxError(e.message);
-        // Передаем результат подключения чтобы закрыть BottomSheet
-        (window as any).AndroidBridge?.onTxComplete?.();
       }
     };
 

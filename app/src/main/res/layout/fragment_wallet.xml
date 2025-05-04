@@ -7,14 +7,6 @@
     android:padding="24dp"
     tools:context=".WalletFragment">
 
-    <Button
-        android:id="@+id/buttonNextFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next fragment"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/imageConnectWallet"
         android:layout_width="wrap_content"
@@ -58,14 +50,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textToWelcome2" />
-
-    <Button
-        android:id="@+id/sendTransaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Отправить транзакцию"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connectToWallet" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
