@@ -48,10 +48,14 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
             domStorageEnabled = true
         }
 
+        // Делаем фон webview прозрачным
         tonWebView.setBackgroundColor(Color.TRANSPARENT)
         tonWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         WebView.setWebContentsDebuggingEnabled(true)
 
+
+        // Объявляем функции которые может запустить react
+        // В нашем случае эти функции отвечают за состояние
         tonWebView.addJavascriptInterface(object {
             @JavascriptInterface
             fun onTxResult(raw: String) {
@@ -64,7 +68,7 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
             }
         }, "AndroidBridge")
 
-        // 4. Кастомный WebViewClient для перехвата deep-link’ов ton://…
+        // Кастомный WebViewClient для перехвата deep-link’ов ton://…
         tonWebView.webViewClient = object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(
@@ -122,10 +126,16 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
         val params = tonWebView.layoutParams
         params.height = 900
         tonWebView.layoutParams = params
+        // Вызываем из react функцию checkConnection()
+        // А ее у нас вроде бы и нет
         tonWebView.evaluateJavascript("window.checkConnection()", null)
+        // Вызываем из react функцию dispatchEvent()
+        // А ее у нас вроде бы и нет
         tonWebView.evaluateJavascript(
             "window.dispatchEvent(new Event('tonConnectReturn'))", null
         )
+        // Вызываем из react функцию sendCid в которую передаем значение
+        // которое достали из MainViewModel
         tonWebView.evaluateJavascript("window.sendCid('$boc')", null)
     }
 }

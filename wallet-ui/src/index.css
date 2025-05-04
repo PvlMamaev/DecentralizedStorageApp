@@ -74,4 +74,8 @@ button:focus-visible {
   background-color: transparent !important;
 }
 
+[data-tc-actions-modal-container="true"][data-tc-modal="true"] {
+  background-color: transparent !important;
+}
+
 
