@@ -13,6 +13,8 @@ function Page() {
   const [tonConnectUI] = useTonConnectUI();
 
   useEffect(() => {
+  // Флаг для BottomSheet чтобы быть уверенным в готовности webview к показу
+  (window as any).ready = true;
 
   const unsub = tonConnectUI.onStatusChange(wallet => {
     if (wallet && isConnectingWallet) {

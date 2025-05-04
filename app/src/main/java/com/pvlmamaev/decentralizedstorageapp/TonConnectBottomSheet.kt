@@ -5,10 +5,13 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -149,16 +152,25 @@ class TonConnectBottomSheet : BottomSheetDialogFragment() {
     }
 
     fun connectWallet() {
-        // если WebView уже загружена
-        if (::tonWebView.isInitialized) {
-            tonWebView.evaluateJavascript("window.connectWalletManually()", null)
-        } else {
-            // иначе, ждем загрузку страницы и потом вызываем
-            tonWebView.webViewClient = object : WebViewClient() {
-                override fun onPageFinished(view: WebView?, url: String?) {
+        val handler = Handler(Looper.getMainLooper())
+
+        // Т.к. если сразу вызвать метод из react после создания webview
+        // то метод просто не выполнится т.к. react еще будет не готов
+        // по этому мы вводим функцию после выполнения которой мы понимаем
+        // что react готов к работе и можено вызывать другие методы
+        fun checkReadyAndConnect() {
+            tonWebView.evaluateJavascript("window.ready === true", ValueCallback { isReady ->
+                if (isReady == "true") {
                     tonWebView.evaluateJavascript("window.connectWalletManually()", null)
+                } else {
+                    handler.postDelayed({ checkReadyAndConnect() }, 200)
                 }
-            }
+            })
+
         }
+
+        checkReadyAndConnect()
     }
+
+
 }
