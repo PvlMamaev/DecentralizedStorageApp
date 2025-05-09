@@ -7,9 +7,7 @@ import java.io.File
 
 class MainViewModel : ViewModel() {
 
-    val selectedFileUri = MutableLiveData<Uri?>()
-    val encryptedFile   = MutableLiveData<File?>()
-    val base64Payload   = MutableLiveData<String?>()
+    val uploadedFiles = MutableLiveData<MutableList<UploadedFile>>(mutableListOf())
 
     /** true, когда tonConnectUI уже привязал кошелёк */
     val walletConnected = MutableLiveData<Boolean>(false)
