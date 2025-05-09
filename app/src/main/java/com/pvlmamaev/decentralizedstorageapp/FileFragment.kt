@@ -15,6 +15,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.crypto.SecretKey
@@ -23,10 +24,12 @@ class FileFragment : Fragment(R.layout.fragment_file) {
     private val tonConnectBottomSheet = TonConnectBottomSheet()
     private val vm: MainViewModel by activityViewModels()
 
-    /* =====  Блоки полей из MainActivity  ===== */
     private var encryptionKey: SecretKey? = null
     private var encryptedFile: File? = null
     private var selectedFileUri: Uri? = null
+
+    // Для сортировки карточек
+    private var sortDescending = true
 
     // TextView-для-лога можно оставить здесь
     private lateinit var selectedFileText: TextView
@@ -51,12 +54,6 @@ class FileFragment : Fragment(R.layout.fragment_file) {
 
                 viewLifecycleOwner.lifecycleScope.launch {
                     try {
-//                        val cid = PinataUploader.uploadFile(encryptedFile!!)
-//                        selectedFileText.append("\nCID: $cid")
-//                        val boc = CidSerializer.cidToBase64Boc(cid)
-//                        vm.base64Payload.postValue(boc)   // главное!
-
-                        // ------------
                         val cid = PinataUploader.uploadFile(encryptedFile!!)
                         val fileName = selectedFileUri?.lastPathSegment ?: "noname"
                         val file = UploadedFile(fileName, cid, encryptedFile = encryptedFile!!)
@@ -75,7 +72,6 @@ class FileFragment : Fragment(R.layout.fragment_file) {
                         Handler(Looper.getMainLooper()).postDelayed({
                             tonConnectBottomSheet.sendTransaction(boc)
                         }, 500)
-                        // ------------
                     } catch (e: Exception) {
                         selectedFileText.append("\nОшибка: ${e.message}")
                     }
@@ -91,15 +87,47 @@ class FileFragment : Fragment(R.layout.fragment_file) {
         recycler.layoutManager = LinearLayoutManager(requireContext())
 
         selectedFileText = v.findViewById(R.id.selectedFileText)
+
+        // FAB или кнопка загрузки
         v.findViewById<View>(R.id.selectFileButton).setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "*/*"
             }
             filePickerLauncher.launch(Intent.createChooser(intent, "Выберите файл"))
-            vm.uploadedFiles.observe(viewLifecycleOwner) { fileList ->
-                recycler.adapter = ItemAdapter(fileList)
-            }
         }
+
+        // Наблюдаем за списком, но применяем текущую сортировку
+        vm.uploadedFiles.observe(viewLifecycleOwner) { fileList ->
+            val sortedList = if (sortDescending) {
+                fileList.sortedByDescending { it.uploadDate }
+            } else {
+                fileList.sortedBy { it.uploadDate }
+            }
+            recycler.adapter = ItemAdapter(sortedList)
+        }
+
+        // Сортировка списка
+        val sortButton = v.findViewById<MaterialButton>(R.id.sortButton)
+        sortButton.setOnClickListener {
+            sortDescending = !sortDescending
+
+            // Повторно применим сортировку к текущему списку
+            vm.uploadedFiles.value?.let { currentList ->
+                val sortedList = if (sortDescending) {
+                    currentList.sortedByDescending { it.uploadDate }
+                } else {
+                    currentList.sortedBy { it.uploadDate }
+                }
+                recycler.adapter = ItemAdapter(sortedList)
+            }
+
+            // Меняем иконку
+            val iconRes = if (sortDescending) R.drawable.ic_arrow_down else R.drawable.ic_arrow_up
+            val text = if (sortDescending) "Недавно добавленные" else "Старые в начале"
+            sortButton.text = text
+            sortButton.setIconResource(iconRes)
+        }
+
     }
 }
 
